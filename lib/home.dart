@@ -1,7 +1,9 @@
 import 'dart:convert';
 
 import 'package:cocktailapp/model/cocktail.dart';
+import 'package:cocktailapp/model/favorite.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 
 class HomePage extends StatefulWidget {
@@ -14,6 +16,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   List<Drinks> drinks = [];
   bool isLoading = true;
+  List<String> favDrinks = [];
+  Box<Favorite> favBox = Hive.box<Favorite>('favBox');
 
   @override
   void initState() {
@@ -43,6 +47,27 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  void addFavorite(String idDrink, Drinks drinks) {
+    setState(() {
+      if (favDrinks.contains(idDrink)) {
+        favDrinks.remove(idDrink);
+        final idToDelete = favBox.values.toList().indexWhere(
+          (fav) => fav.idDrink == idDrink,
+        );
+        favBox.deleteAt(idToDelete);
+      } else {
+        favDrinks.add(idDrink);
+        favBox.add(
+          Favorite(
+            strDrink: drinks.strDrink ?? 'null',
+            strDrinkThumb: drinks.strDrinkThumb ?? '',
+            idDrink: drinks.idDrink ?? 'null',
+          ),
+        );
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -63,6 +88,22 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                           title: Text('${drinks[index].strDrink}'),
+                          trailing: IconButton(
+                            onPressed:
+                                () => addFavorite(
+                                  drinks[index].idDrink ?? 'null',
+                                  drinks[index],
+                                ),
+                            icon: Icon(
+                              favDrinks.contains(drinks[index].idDrink)
+                                  ? Icons.favorite
+                                  : Icons.favorite_border,
+                              color:
+                                  favDrinks.contains(drinks[index].idDrink)
+                                      ? Colors.red
+                                      : null,
+                            ),
+                          ),
                         );
                       },
                     ),

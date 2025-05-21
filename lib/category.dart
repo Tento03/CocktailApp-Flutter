@@ -66,11 +66,7 @@ class _CategoryPageState extends State<CategoryPage>
         final List jsonFinal = jsonMap['drinks'];
 
         setState(() {
-          if (jsonFinal != null) {
-            drinks = jsonFinal.map((e) => Drinks.fromJson(e)).toList();
-          } else {
-            drinks = [];
-          }
+          drinks = jsonFinal.map((e) => Drinks.fromJson(e)).toList();
           isLoading = false;
         });
       } else {

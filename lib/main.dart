@@ -1,10 +1,17 @@
 import 'package:cocktailapp/category.dart';
+import 'package:cocktailapp/favorite.dart';
 import 'package:cocktailapp/home.dart';
+import 'package:cocktailapp/model/favorite.dart';
 import 'package:cocktailapp/search.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/adapters.dart';
 
-void main(List<String> args) {
+void main(List<String> args) async {
+  await Hive.initFlutter;
+  Hive.registerAdapter(FavoriteAdapter());
+  await Hive.openBox<Favorite>('favBox');
   runApp(MyApp());
 }
 
@@ -30,6 +37,7 @@ class _BottomPageState extends State<BottomPage> {
     HomePage(),
     SearchPage(),
     DefaultTabController(length: 6, child: CategoryPage()),
+    FavoritePage(),
   ];
 
   @override
@@ -46,6 +54,7 @@ class _BottomPageState extends State<BottomPage> {
           TabItem(icon: Icon(Icons.home), title: 'Home'),
           TabItem(icon: Icon(Icons.search), title: 'Search'),
           TabItem(icon: Icon(Icons.category), title: 'Category'),
+          TabItem(icon: Icon(Icons.favorite), title: 'Favorite'),
         ],
       ),
       body: pages[selectedIndex],
